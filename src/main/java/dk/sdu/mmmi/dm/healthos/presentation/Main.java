@@ -1,9 +1,6 @@
 package dk.sdu.mmmi.dm.healthos.presentation;
 
-import dk.sdu.mmmi.dm.healthos.domain.Bed;
-import dk.sdu.mmmi.dm.healthos.domain.Employee;
-import dk.sdu.mmmi.dm.healthos.domain.IPersistanceHandler;
-import dk.sdu.mmmi.dm.healthos.domain.Patient;
+import dk.sdu.mmmi.dm.healthos.domain.*;
 import dk.sdu.mmmi.dm.healthos.persistance.PersistanceHandler;
 
 import java.sql.Connection;
@@ -59,8 +56,14 @@ public class Main {
                         System.out.println("What is the bed ID?");
                         System.out.println(persistanceHandler.getBed(Integer.parseInt(s.nextLine())));
                         break;
+                    case "createbed":
+                        System.out.println("What is the bed number?");
+                        System.out.println(persistanceHandler.createBed(new Bed(s.nextLine())));
+                        break;
                     case "getadmissions":
-                        System.out.println(persistanceHandler.getAdmissions());
+                        for (Admission ad : persistanceHandler.getAdmissions()) {
+                            System.out.println(ad.toString());
+                        }
                         break;
                     case "getadmission":
                         System.out.println("What is the admission ID?");
@@ -70,22 +73,18 @@ public class Main {
                         running = false;
                         break;
                     case "createemployee":
-
                         System.out.println("Name, phone number, position_id, department_id, room_id");
                         System.out.println(persistanceHandler.createEmployee(new Employee(s.nextLine(), Integer.parseInt(s.nextLine()),
                                 Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()))));
-
-                        /*
-                        String[] info = null;
-                        System.out.println("Name of the employee, phone number, position_id, department_id, room_id, separeted by comma no spaces");
-                        info = s.nextLine().split(",");
-                        if (info.length > 5) {
-                            System.out.println("Invalid data insertion, try again without spacing.");
-                            break;
-                        }
-                        System.out.println(persistanceHandler.createEmployee(new Employee(info[0], Integer.parseInt(info[1]),
-                                Integer.parseInt(info[2]), Integer.parseInt(info[3]), Integer.parseInt(info[4]))));
-                        */
+                        break;
+                    case "createadmission":
+                        System.out.println("patient_id, room_id, bed_id, assigned_employee_id");
+                        System.out.println(persistanceHandler.createAdmission(new Admission(Integer.parseInt(s.nextLine()),
+                                Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()), Integer.parseInt(s.nextLine()))));
+                        break;
+                    case "deleteadmission":
+                        System.out.println("Enter admission id");
+                        System.out.println(persistanceHandler.deleteAdmission(Integer.parseInt(s.nextLine())));
                         break;
                     case "createpatient":
                         System.out.println("Name, Phone, CPR");
@@ -111,8 +110,8 @@ public class Main {
                 + "- getAdmissions\n"
                 + "- getAdmission\n"
                 + "- createEmployee\n"
-                + "- exit\n"
-                + "- exit\n"
+                + "- deleteAdmission\n"
+                + "- createAdmission\n"
                 + "- exit\n";
     }
 }

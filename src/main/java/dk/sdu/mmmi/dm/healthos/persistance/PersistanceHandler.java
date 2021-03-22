@@ -113,7 +113,6 @@ public class PersistanceHandler implements IPersistanceHandler{
             System.out.println("An error inserting into database occurred");
             return false;
         }
-
         return true;
     }
 
@@ -179,7 +178,7 @@ public class PersistanceHandler implements IPersistanceHandler{
             ResultSet sqlReturnValues = stmt.executeQuery();
             List<Bed> returnValue = new ArrayList<>();
             while (sqlReturnValues.next()){
-                returnValue.add(new Bed(sqlReturnValues.getString(1)));
+                returnValue.add(new Bed(sqlReturnValues.getInt(1), sqlReturnValues.getString(2)));
             }
             return returnValue;
         } catch (SQLException ex) {
@@ -206,30 +205,83 @@ public class PersistanceHandler implements IPersistanceHandler{
 
     @Override
     public boolean createBed(Bed bed) {
-        //make HealthOS support this action in the presentation layer too.
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO beds (bed_number) VALUES (?)");
+            insertStatement.setString(1, bed.getBed_number());
+            insertStatement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            System.out.println("An error inserting into database occurred");
+            return false;
+        }
+        return true;
     }
 
     @Override
     public List<Admission> getAdmissions() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM admissions");
+            ResultSet sqlReturnValues = stmt.executeQuery();
+            List<Admission> returnValue = new ArrayList<>();
+            while (sqlReturnValues.next()){
+                returnValue.add(new Admission(sqlReturnValues.getInt(1), sqlReturnValues.getInt(2),
+                        sqlReturnValues.getInt(3), sqlReturnValues.getInt(4)));
+            }
+            return returnValue;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public Admission getAdmission(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM admissions WHERE id = ?");
+            stmt.setInt(1, id);
+            ResultSet sqlReturnValues = stmt.executeQuery();
+            if (!sqlReturnValues.next()){
+                return null;
+            }
+            return new Admission(sqlReturnValues.getInt(1), sqlReturnValues.getInt(2),
+                    sqlReturnValues.getInt(3),sqlReturnValues.getInt(4), sqlReturnValues.getInt(5));
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
     public boolean createAdmission(Admission admission) {
-        //make HealthOS support this action in the presentation layer too.
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            PreparedStatement insertStatement = connection.prepareStatement("INSERT INTO admissions (patient_id, room_id, bed_id, assigned_employee_id) VALUES (?,?,?,?)");
+            insertStatement.setInt(1, admission.getPatient_id());
+            insertStatement.setInt(2, admission.getRoomid());
+            System.out.println(admission.getRoomid());
+            insertStatement.setInt(3, admission.getBed_id());
+            insertStatement.setInt(4, admission.getAssigned_employee_id());
+            insertStatement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            System.out.println("An error inserting into database occurred");
+            return false;
+        }
+        System.out.println("New admission created!");
+        return true;
     }
 
     @Override
     public boolean deleteAdmission(int id) {
-        //make HealthOS support this action in the presentation layer too.
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            PreparedStatement insertStatement = connection.prepareStatement("DELETE FROM admissions WHERE id = ?");
+            insertStatement.setInt(1, id);
+            insertStatement.execute();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            System.out.println("An error inserting into database occurred");
+            return false;
+        }
+        System.out.println("Deleted: " + id);
+        return true;
     }
-
 }
